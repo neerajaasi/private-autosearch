@@ -1,0 +1,84 @@
+output_root: "results"
+job_titles:
+  # VERY COMMON
+  - "Data Analyst"
+  - "Business Analyst"
+  - "Business Systems Analyst"
+  - "Business Data Analyst"
+  - "Data Engineer"
+  - "Data Scientist"
+  - "Quality Assurance Engineer"
+  - "Python Developer"
+  - "AWS Engineer"
+  - "AWS Cloud Engineer"
+  - "Reporting Analyst"
+  - "Fill-Rate Analyst"
+  - "Commercial Analytics BA"
+  - "PLM Business Analyst"
+  - "WMS Business Analyst"
+  - "Claims Business Analyst"
+  - "Manufacturing Business Analyst"
+  - "Quality Business Analyst"
+
+  # COMMON
+  - "Systems Business Analyst"
+  - "Technical BA"
+  - "Insights Analyst"
+  - "Operations Data Analyst"
+  - "Enrollment & Eligibility Analyst"
+  - "EDI Analyst"
+  - "Payments Interface Analyst"
+  - "Partner Onboarding Analyst"
+
+  # MODERATELY COMMON
+  - "Analytics Analyst"
+  - "Government Data Analyst"
+  - "Program Evaluation Analyst"
+  - "Education Outcomes Analyst"
+  - "Denials & Appeals Analyst"
+  - "Quality Data Analyst"
+  - "Quality & Outcomes Analyst"
+
+  #Oracle Titles
+  - "Oracle System analyst"
+  - "Oracle IT consultant"
+  - "Oracle supply chain Techno - functional"
+  - "Oracle HCM & Human capital Management"
+
+  # UNCOMMON
+  - "Validation Analyst"
+  - "Catastrophe Modeling Analyst"
+  - "Loss Analytics Analyst"
+  - "Network Optimization Analyst"
+  - "Grid Analytics Analyst"
+  - "Load Forecasting Analyst"
+
+  # NICHE SPECIALIZED (ADVANCED DS)
+  - "Education Outcomes Scientist"
+  - "Fraud Data Scientist"
+  - "Fraud Detection Data Scientist"
+  - "NLP Scientist"
+  - "Recommendation Systems Scientist"
+  - "Risk Modeling Scientist"
+  - "Route Optimization Scientist"
+
+regions:
+  - "United States"
+  - "USA"
+  - "remote"
+
+days_back: 1
+
+filters:
+  posted_time_hours: 24
+  job_type:
+    - "C" # Contract
+    - "F"
+
+scraper:
+  max_jobs: 40
+credentials:
+  serpapi_key: "38c6bc98a4080e10ae2a3ac448a4424d6e58e16d91b09139eb0ea55b8b3b7131"
+
+features:
+  enable_rate_scrape: false
