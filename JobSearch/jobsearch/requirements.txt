@@ -8,3 +8,5 @@ scikit-learn
 python-docx
 PyMuPDF
 serpapi
+pandas
+openpyxl

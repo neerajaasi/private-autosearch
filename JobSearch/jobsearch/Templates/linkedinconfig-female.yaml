@@ -1,0 +1,45 @@
+output_root: "results/linkedin-female"
+job_titles:
+  - "Data Analyst"
+  - "Business Analyst"
+  - "Business Systems Analyst"
+  - "Business Data Analyst"
+  - "Quality Assurance Engineer"
+  - "EDI Analyst"
+  - "Quality Business Analyst"
+  - "Systems Business Analyst"
+  - "Technical BA"
+  - "Quality Data Analyst"
+  - "AWS Support Engineer"
+  - "AWS Cloud Support Engineer"
+  - "DevOps Engineer"
+  - "Application Support Engineer"
+  - "Devops"
+  - "Support Engineer"
+  - "SQL developer"
+  - "ETL Developer"
+  - "ETL Tester"
+  - "SQL Administrator"
+
+regions:
+  - "USA"
+  - "Unites States"
+  - "Remote"
+
+days_back: 15
+
+filters:
+  posted_time_hours: 24
+  job_type:
+    - "C"
+    - "F"
+
+scraper:
+  max_jobs: 40
+credentials:
+  serpapi_key: "38c6bc98a4080e10ae2a3ac448a4424d6e58e16d91b09139eb0ea55b8b3b7131"
+
+features:
+  enable_rate_scrape: false
+
+max_pages: 50

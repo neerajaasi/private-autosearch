@@ -1,0 +1,25 @@
+output_root: "results/linkedin-Pran"
+job_titles:
+  - "Business Analyst"
+
+regions:
+  - "Canada"
+  - "Remote"
+
+days_back: 15
+
+filters:
+  posted_time_hours: 24
+  job_type:
+    - "C"
+    - "F"
+
+scraper:
+  max_jobs: 40
+credentials:
+  serpapi_key: "38c6bc98a4080e10ae2a3ac448a4424d6e58e16d91b09139eb0ea55b8b3b7131"
+
+features:
+  enable_rate_scrape: false
+
+max_pages: 50

@@ -1,0 +1,3 @@
+# List one site per line. Available sites:
+roberthalf
+randstad

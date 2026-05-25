@@ -10,6 +10,10 @@ from urllib.parse import quote
 from datetime import datetime, timedelta, date
 from openpyxl import Workbook, load_workbook
 
+# ------------------------------------------------------
+# CONSTANTS
+# ------------------------------------------------------
+RESULTS_PER_PAGE = 25
 
 # ------------------------------------------------------
 # CONFIG PATH
@@ -18,7 +22,6 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 JOBSEARCH_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 CONFIG_PATH = os.path.join(JOBSEARCH_ROOT, "config", "linkedinconfig.yaml")
 
-
 # ------------------------------------------------------
 # LOAD CONFIG
 # ------------------------------------------------------
@@ -26,25 +29,23 @@ def load_config():
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
-
 # ------------------------------------------------------
 # EXCEL FILE CREATION
 # ------------------------------------------------------
 def generate_output_file(output_root):
     today = datetime.now().strftime("%Y-%m-%d")
-    out_dir = os.path.join(JOBSEARCH_ROOT, output_root, "linkedin")
+    out_dir = os.path.join(JOBSEARCH_ROOT, output_root)
     os.makedirs(out_dir, exist_ok=True)
 
     base = f"LinkedIn_Jobs_{today}.xlsx"
     file_path = os.path.join(out_dir, base)
 
-    counter = 2
+    counter = 1
     while os.path.exists(file_path):
         file_path = os.path.join(out_dir, f"LinkedIn_Jobs_{today}_run{counter}.xlsx")
         counter += 1
 
     return file_path
-
 
 def initialize_excel_file(filepath):
     if not os.path.exists(filepath):
@@ -52,24 +53,40 @@ def initialize_excel_file(filepath):
         wb.active.title = "Sheet1"
         wb.save(filepath)
 
-
 # ------------------------------------------------------
 # BUILD SEARCH URL
 # ------------------------------------------------------
-def build_url(job_title, region, posted_hours, job_type):
+def build_url(job_title, region, posted_hours, job_type, start):
     posted_param = f"r{posted_hours * 3600}"
-    remote_filter = "&f_WT=2" if region.lower() == "remote" else ""
+    is_remote = "remote" in region.lower()
 
-    return (
-        "https://www.linkedin.com/jobs/search/?"
-        f"keywords={quote(job_title)}&"
-        "location=United%20States&"
-        f"f_JT={job_type}"
-        f"{remote_filter}"
-        f"&f_TPR={posted_param}"
-    )
+    base_url = "https://www.linkedin.com/jobs/search/"
 
+    if is_remote:
+        # USA-focused remote search
+        quoted_title = quote(job_title + " remote usa")
 
+        return (
+            f"{base_url}?"
+            f"keywords={quoted_title}&"
+            "&f_WT=2"                 # Remote filter
+            f"&f_TPR={posted_param}"
+            f"&f_JT={job_type}"
+            f"&start={start}"
+        )
+    else:
+        # USA onsite/hybrid jobs
+        quoted_title = quote(job_title)
+
+        return (
+            f"{base_url}?"
+            f"keywords={quoted_title}&"
+            "location=United%20States&"
+            "geoId=103644278&"        # USA geoId
+            f"&f_TPR={posted_param}"
+            f"&f_JT={job_type}"
+            f"&start={start}"
+        )
 # ------------------------------------------------------
 # FETCH HTML
 # ------------------------------------------------------
@@ -82,11 +99,10 @@ def fetch_html(url):
         )
     }
     try:
-        r = requests.get(url, headers=headers, timeout=15)
+        r = requests.get(url, headers=headers, timeout=20)
         return r.text if r.status_code == 200 else None
     except:
         return None
-
 
 # ------------------------------------------------------
 # POSTED TIME NORMALIZATION
@@ -94,54 +110,23 @@ def fetch_html(url):
 def normalize_posted(text):
     if not text:
         return ""
-
     text = text.lower().strip()
     today = date.today()
 
     try:
-        if "hour" in text or "minute" in text:
+        if "minute" in text or "hour" in text:
             return today.isoformat()
         if "day" in text:
             return (today - timedelta(days=int(text.split()[0]))).isoformat()
-        if "week" in text:
-            return (today - timedelta(days=7 * int(text.split()[0]))).isoformat()
     except:
         pass
 
     return text
 
-
-# ------------------------------------------------------
-# RATE EXTRACTION (OPTIONAL)
-# ------------------------------------------------------
-RATE_REGEX = re.compile(
-    r'(\$[\d,]+(?:\.\d+)?\s*(?:-|to)?\s*\$?[\d,]+(?:\.\d+)?\s*'
-    r'(?:/hr|per hour|hourly|/year|per year|annually|k))',
-    re.IGNORECASE
-)
-
-
-def extract_rate(text):
-    if not text:
-        return ""
-    m = RATE_REGEX.search(text)
-    return m.group(1) if m else ""
-
-
-def fetch_job_description(url):
-    html = fetch_html(url)
-    if not html:
-        return ""
-
-    soup = BeautifulSoup(html, "html.parser")
-    desc = soup.select_one("div.show-more-less-html__markup")
-    return desc.get_text(" ", strip=True) if desc else ""
-
-
 # ------------------------------------------------------
 # PARSE SEARCH RESULTS
 # ------------------------------------------------------
-def parse_search(html, job_type, remote_mode, enable_rate_scrape):
+def parse_search(html, job_type, remote_mode):
     soup = BeautifulSoup(html, "html.parser")
     cards = soup.select("div.base-card")
 
@@ -152,11 +137,7 @@ def parse_search(html, job_type, remote_mode, enable_rate_scrape):
         company_el = c.select_one("h4")
         location_el = c.select_one("span.job-search-card__location")
         link_el = c.find("a", class_="base-card__full-link")
-
-        time_el = (
-                c.select_one("time") or
-                c.select_one("span.job-search-card__listdate")
-        )
+        time_el = c.select_one("time")
 
         posted_raw = time_el.text.strip() if time_el else ""
         posted = normalize_posted(posted_raw)
@@ -167,12 +148,6 @@ def parse_search(html, job_type, remote_mode, enable_rate_scrape):
 
         job_url = link_el["href"].split("?")[0] if link_el else ""
 
-        rate = ""
-        if enable_rate_scrape and job_url:
-            desc_text = fetch_job_description(job_url)
-            rate = extract_rate(desc_text)
-            time.sleep(random.uniform(0.4, 0.7))
-
         rows.append({
             "title": title_el.text.strip() if title_el else "",
             "company": company_el.text.strip() if company_el else "",
@@ -180,12 +155,10 @@ def parse_search(html, job_type, remote_mode, enable_rate_scrape):
             "job_type": job_type,
             "posted": posted,
             "posted_raw": posted_raw,
-            "rate": rate,
             "url": job_url,
         })
 
     return rows
-
 
 # ------------------------------------------------------
 # SAFE SHEET APPEND
@@ -202,7 +175,6 @@ def append_sheet(filepath, sheet_name, df):
 
     with pd.ExcelWriter(filepath, engine="openpyxl", mode="a") as writer:
         df.to_excel(writer, sheet_name=sheet_name, index=False)
-
 
 # ------------------------------------------------------
 # SAVE SHEET
@@ -221,7 +193,6 @@ def save_sheet(job_title, records, filepath):
     append_sheet(filepath, job_title[:31], df)
     print(f"[SAVED] {job_title} ({len(df)} rows)")
 
-
 # ------------------------------------------------------
 # MAIN
 # ------------------------------------------------------
@@ -232,9 +203,10 @@ def run():
     posted_hours = cfg["filters"]["posted_time_hours"]
     job_types = cfg["filters"]["job_type"]
     output_root = cfg.get("output_root", "results")
-    enable_rate_scrape = cfg.get("features", {}).get("enable_rate_scrape", False)
+    max_pages = cfg.get("max_pages", 10)
+    regions = ["United States", "remote"]
 
-    regions = ["United States", "Remote"]
+    print(f"[CONFIG] posted_hours={posted_hours}, max_pages={max_pages}")
 
     excel_path = generate_output_file(output_root)
     initialize_excel_file(excel_path)
@@ -247,24 +219,48 @@ def run():
             for region in regions:
                 print(f"[SEARCH] {job_type} | {region}")
 
-                url = build_url(job_title, region, posted_hours, job_type)
-                html = fetch_html(url)
+                start = 0
+                page = 1
 
-                if not html:
-                    continue
+                while page <= max_pages:
+                    print(f"  [PAGE] {page}")
 
-                results = parse_search(
-                    html,
-                    job_type,
-                    region.lower() == "remote",
-                    enable_rate_scrape
-                )
+                    url = build_url(
+                        job_title,
+                        region,
+                        posted_hours,
+                        job_type,
+                        start
+                    )
 
-                combined.extend(results)
-                time.sleep(random.uniform(0.25, 0.5))
+                    html = fetch_html(url)
+                    if not html:
+                        break
+
+                    results = parse_search(
+                        html,
+                        job_type,
+                        region.lower() == "remote"
+                    )
+
+                    print(f"    → jobs found: {len(results)}")
+
+                    if not results:
+                        break
+
+                    combined.extend(results)
+
+                    if len(results) < RESULTS_PER_PAGE:
+                        break
+
+                    start += RESULTS_PER_PAGE
+                    page += 1
+                    time.sleep(random.uniform(0.6, 1.1))
 
         save_sheet(job_title, combined, excel_path)
 
-
+# ------------------------------------------------------
+# ENTRY POINT
+# ------------------------------------------------------
 if __name__ == "__main__":
     run()

@@ -1,0 +1,77 @@
+output_root: "results/linkedin"
+job_titles:
+  #business_analyst_roles
+  - "Business Analyst"
+  - "Business Systems Analyst"
+  - "Business Data Analyst"
+  - "Commercial Analytics BA"
+  - "PLM Business Analyst"
+  - "WMS Business Analyst"
+  - "Claims Business Analyst"
+  - "Manufacturing Business Analyst"
+  - "Quality Business Analyst"
+  - "Systems Business Analyst"
+  - "Technical BA"
+
+  #data_analyst_roles
+  - "Data Analyst"
+  - "Reporting Analyst"
+  - "Insights Analyst"
+  - "Operations Data Analyst"
+  - "Enrollment & Eligibility Analyst"
+  - "EDI Analyst"
+  - "Payments Interface Analyst"
+  - "Partner Onboarding Analyst"
+  - "Analytics Analyst"
+  - "Government Data Analyst"
+  - "Quality Data Analyst"
+
+  #qa_quality_assurance_roles
+  - "Validation Analyst"
+  - "Quality Assurance Engineer"
+  - "QA Automation Engineer"
+  - "Test Engineer"
+  - "Test Automation Engineer"
+  - "SDET"
+
+  #systems_analyst_roles
+  - "Oracle System Analyst"
+  - "Oracle IT Consultant"
+  - "Oracle Supply Chain Techno-Functional"
+
+  #technology_roles
+  - "AWS Engineer"
+  - "Cloud Engineer"
+  - "Data Engineer"
+  - "Data Scientist"
+  - "Python Developer"
+
+#Others
+  - "Devops"
+  - "SQL developer"
+  - "ETL Developer"
+  - "ETL Tester"
+  - "SQL Administrator"
+  - "Cyber Security Analyst"
+  - "SOC Analyst"
+
+regions:
+  - "United States"
+  - "Remote"
+
+days_back: 15
+
+filters:
+  posted_time_hours: 24
+  job_type:
+    - "F"
+
+scraper:
+  max_jobs: 40
+credentials:
+  serpapi_key: "38c6bc98a4080e10ae2a3ac448a4424d6e58e16d91b09139eb0ea55b8b3b7131"
+
+features:
+  enable_rate_scrape: false
+
+max_pages: 50

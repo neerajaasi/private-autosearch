@@ -1,0 +1,43 @@
+output_root: "results/dice"
+
+job_titles:
+  - "Data Analyst"
+  - "Business Analyst"
+  - "Business Systems Analyst"
+  - "Business Data Analyst"
+  - "Quality Assurance Engineer"
+  - "EDI Analyst"
+  - "Quality Business Analyst"
+  - "Systems Business Analyst"
+  - "Technical BA"
+  - "Quality Data Analyst"
+  - "AWS Support Engineer"
+  - "AWS Cloud Support Engineer"
+  - "DevOps Engineer"
+  - "Application Support Engineer"
+  - "SQL developer"
+  - "Cyber Security Analyst"
+  - "SOC Analyst"
+  - "ETL Developer"
+  - "ETL Tester"
+  - "SQL Administrator"
+  - "Devops"
+  - "Support Engineer"
+
+regions:
+  - "United States"
+filters:
+  posted_time_hours: 24
+  work_setting:
+    - "Remote"
+    - "Hybrid"
+    - "On-Site"
+  employment_type:
+    - "Contract"
+    - "FullTime"
+    - "ThirdParty"
+  employer_type:
+    - "Direct hire"
+    - "Recruiter"
+scraper:
+  max_pages: 50

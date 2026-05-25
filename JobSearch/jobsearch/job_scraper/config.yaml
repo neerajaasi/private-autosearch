@@ -1,0 +1,23 @@
+# ─────────────────────────────────────────────────────
+#  config.yaml — Job Search Configuration
+# ─────────────────────────────────────────────────────
+
+# Job titles to search (applied to ALL sites)
+titles:
+  - Business Analyst
+  - Data Analyst
+  - Quality Assurance Engineer
+  - QA Engineer
+  - Business Data Analyst
+
+# Default location (used when site supports location filtering)
+location: "united states"
+
+# Date filter — applied on each site after search
+# Options: "Past 24 hours", "Past week", "Past month", or "none" to skip
+date_filter: "Past 24 hours"
+
+# Output settings
+output:
+  filename: "job_results.xlsx"   # Excel output file
+  directory: "output"            # Output folder
